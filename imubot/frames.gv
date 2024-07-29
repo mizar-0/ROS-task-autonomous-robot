@@ -1,0 +1,13 @@
+digraph G {
+"body_link" -> "castor_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"dummy" -> "body_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"odom" -> "dummy"[label=" Broadcaster: /gazebo\nAverage rate: 100.2\nBuffer length: 4.99\nMost recent transform: 1510.034\nOldest transform: 1505.044\n"];
+"body_link" -> "imu_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"body_link" -> "laser_link"[label=" Broadcaster: /robot_state_publisher\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"dummy" -> "wheel1_link"[label=" Broadcaster: /gazebo\nAverage rate: 101.603\nBuffer length: 4.99\nMost recent transform: 1510.035\nOldest transform: 1505.045\n"];
+"dummy" -> "wheel2_link"[label=" Broadcaster: /gazebo\nAverage rate: 101.603\nBuffer length: 4.99\nMost recent transform: 1510.035\nOldest transform: 1505.045\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1510.046"[ shape=plaintext ] ;
+}->"odom";
+}

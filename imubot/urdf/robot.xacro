@@ -1,0 +1,328 @@
+<?xml version= "1.0"?>
+<!--  TWO WHEELED DIFFERENTIAL DRIVE ROBOT -->
+<!--  -->
+<!--  -->
+<!--  -->
+
+<robot name="diffbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!-- MATERIALS -->
+
+  <material name="black">
+    <color rgba="0.0 0.0 0.0 1.0"/>
+  </material>
+
+  <material name="blue">
+    <color rgba="0.0 0.0 0.8 1.0"/>
+  </material>
+
+  <material name="green">
+    <color rgba="0.0 0.8 0.0 1.0"/>
+  </material>
+
+  <material name="gray">
+    <color rgba="0.7 0.7 0.7 1.0"/>
+  </material>
+
+  <material name="darkgray">
+    <color rgba="0.3 0.3 0.3 1.0"/>
+  </material>
+
+  <material name="red">
+    <color rgba="0.8 0.0 0.0 1.0"/>
+  </material>
+
+  <material name="white">
+    <color rgba="1.0 1.0 1.0 1.0"/>
+  </material>
+
+  <material name="yellow">
+    <color rgba="0.8 0.8 0.0 1.0"/>
+  </material>
+
+<!-- DIMENSIONS -->
+<xacro:property name= "body_link_x_dim" value = "1.0"/>
+<xacro:property name= "body_link_y_dim" value = "0.6"/>
+<xacro:property name= "body_link_z_dim" value = "0.3"/>
+
+
+
+<xacro:property name= "wheel_link_radius" value = "0.15"/>
+<xacro:property name= "wheel_link_length" value = "0.1"/>
+<xacro:property name= "wheel_link_z_location" value = "-0.1"/>
+
+<xacro:property name= "sensor_link_radius" value = "0.05"/>
+<xacro:property name= "sensor_link_length" value = "0.05"/>
+
+
+<xacro:property name= "castor_link_radius" value = "0.15"/>
+<xacro:property name= "castor_link_z_location" value = "-0.1"/>
+
+
+<xacro:property name= "body_density" value = "2710.0"/>
+<xacro:property name= "wheel_density" value = "2710.0"/>
+<xacro:property name= "sensor_density" value = "2710.0"/>
+<xacro:property name= "castor_density" value = "2710.0"/>
+
+
+
+<xacro:property name= "pi" value = "3.14159265359"/>
+
+
+<xacro:property name= "body_mass" value = "${body_density*body_link_x_dim*body_link_y_dim*body_link_z_dim}"/>
+<xacro:property name= "wheel_mass" value = "${wheel_density*pi*wheel_link_radius*wheel_link_radius*wheel_link_length}"/>
+<xacro:property name= "sensor_mass" value = "${sensor_density*pi*sensor_link_radius*sensor_link_radius*sensor_link_length}"/>
+<xacro:property name= "castor_mass" value = "${castor_density*(4/3)*pi*castor_link_radius*castor_link_radius*castor_link_radius}"/>
+
+<!-- MI OF WHEEL -->
+<xacro:property name= "Iz_wheel" value = "${0.5*wheel_mass*wheel_link_radius*wheel_link_radius}"/>
+<xacro:property name= "I_wheel" value = "${(wheel_mass/12.0)*(wheel_link_length*wheel_link_length+3.0*wheel_link_radius*wheel_link_radius)}"/>
+
+<!-- MI OF SENSOR -->
+<xacro:property name= "Iz_sensor" value = "${0.5*sensor_mass*sensor_link_radius*sensor_link_radius}"/>
+<xacro:property name= "I_sensor" value = "${(sensor_mass/12.0)*(sensor_link_length*sensor_link_length+3.0*sensor_link_radius*sensor_link_radius)}"/>
+
+<!-- MI OF CASTOR WHEEL -->
+<xacro:property name= "I_castor" value = "${(2.0/5.0)*castor_mass*castor_link_radius*castor_link_radius}"/>
+
+
+<!-- inerial properties of the wheel -->
+<xacro:macro name= "inertia_wheel">
+	<inertial>
+	<origin rpy="0 0 0" xyz="0 0 0"/>
+	<mass value="${wheel_mass}"/>
+	<inertia ixx="${I_wheel}" ixy="0" ixz="0" iyy="${I_wheel}" iyz="0" izz = "${Iz_wheel}" />
+	</inertial>
+</xacro:macro>
+
+<!-- inerial properties of the sensors -->
+<xacro:macro name= "inertia_sensor">
+	<inertial>
+	<origin rpy="0 0 0" xyz="0 0 0"/>
+	<mass value="${sensor_mass}"/>
+	<inertia ixx="${I_sensor}" ixy="0" ixz="0" iyy="${I_sensor}" iyz="0" izz = "${Iz_sensor}" />
+	</inertial>
+</xacro:macro>
+	
+
+<!-- inerial properties of the castor wheel -->
+<xacro:macro name= "inertia_castor">
+	<inertial>
+	<origin rpy="0 0 0" xyz="0 0 0"/>
+	<mass value="${castor_mass}"/>
+	<inertia ixx="${I_castor}" ixy="0" ixz="0" iyy="${I_castor}" iyz="0" izz = "${I_castor}" />
+	</inertial>
+</xacro:macro>
+	
+
+	
+	
+<!-- extra files/motion control driver -->
+<xacro:include filename = "$(find imubot)/urdf/robot.gazebo" />
+<!-- -->
+
+<!-- DEFINITION OF LINKS AND JOINTS -->
+
+<!--DUMMY LINK AND JOINT -->
+<link name="dummy">
+</link>
+<joint name="dummy_joint" type ="fixed">
+	<parent link ="dummy"/>
+	<child link ="body_link"/>
+</joint>
+
+<!-- BODY LINK -->
+<link name="body_link">
+	<visual>
+		<geometry>
+			<box size="${body_link_x_dim} ${body_link_y_dim} ${body_link_z_dim}" />
+		</geometry>
+		<origin rpy="0 0 0" xyz = "0 0 0"/>
+		<material name="red"/>
+	</visual>
+	
+	<collision>
+		<geometry>
+			<box size="${body_link_x_dim} ${body_link_y_dim} ${body_link_z_dim}" />
+		</geometry>
+		<origin rpy="0 0 0" xyz = "0 0 0"/>
+	</collision>
+	
+	<inertial>
+		<origin rpy="0 0 0" xyz="0 0 0"/>
+		<mass value="${body_mass}"/>
+	<inertia 
+	ixx="${(1/12)*body_mass*(body_link_y_dim*body_link_y_dim+body_link_z_dim*body_link_z_dim)}"
+	ixy="0"
+	ixz="0"
+	iyz="0"
+	iyy="${(1/12)*body_mass*(body_link_x_dim*body_link_x_dim+body_link_z_dim*body_link_z_dim)}"
+	izz="${(1/12)*body_mass*(body_link_y_dim*body_link_y_dim+body_link_x_dim*body_link_x_dim)}" />
+	</inertial>
+	
+</link>
+
+<!-- END BODY LINK -->
+ 
+<!-- BACK RIGHT WHEEL LINK AND JOINT -->
+
+<joint name="wheel1_joint" type="continuous">
+	<parent link="body_link"/>
+	<child link="wheel1_link"/>
+	<origin xyz="${-2*wheel_link_radius} ${-body_link_y_dim/2-wheel_link_length/2} ${wheel_link_z_location}" rpy="0 0 0" />
+	<axis xyz="0 1 0" />
+	<limit effort="1000" velocity="1000"/>
+	<dynamics damping="1.0" friction="2.0"/>
+</joint>
+
+<link name="wheel1_link">
+	<visual>
+		<geometry>
+			<cylinder length="${wheel_link_length}" radius="${wheel_link_radius}" />
+		</geometry>
+		<origin rpy="1.57079633 0 0" xyz = "0 0 0"/>
+		<material name="yellow"/>
+	</visual>
+	
+	<collision>
+		<geometry>
+			<cylinder length="${wheel_link_length}" radius="${wheel_link_radius}" />
+		</geometry>
+		<origin rpy="1.57079633 0 0" xyz = "0 0 0"/>
+	</collision>
+	
+	<xacro:inertia_wheel/>
+</link>
+
+<!-- BACK LEFT WHEEL LINK AND JOINT -->
+
+<joint name="wheel2_joint" type="continuous">
+	<parent link="body_link"/>
+	<child link="wheel2_link"/>
+	<origin xyz="${-2*wheel_link_radius} ${body_link_y_dim/2+wheel_link_length/2} ${wheel_link_z_location}" rpy="0 0 0" />
+	<axis xyz="0 1 0" />
+	<limit effort="1000" velocity="1000"/>
+	<dynamics damping="1.0" friction="2.0"/>
+</joint>
+
+<link name="wheel2_link">
+	<visual>
+		<geometry>
+			<cylinder length="${wheel_link_length}" radius="${wheel_link_radius}" />
+		</geometry>
+		<origin rpy="1.57079633 0 0" xyz = "0 0 0"/>
+		<material name="yellow"/>
+	</visual>
+	
+	<collision>
+		<geometry>
+			<cylinder length="${wheel_link_length}" radius="${wheel_link_radius}" />
+		</geometry>
+		<origin rpy="1.57079633 0 0" xyz = "0 0 0"/>
+	</collision>
+	
+	<xacro:inertia_wheel />
+</link>
+
+
+<!-- CASTOR WHEEL JOINT AND LINK-->
+
+<joint name="castor_joint" type="fixed">
+	<parent link="body_link"/>
+	<child link="castor_link"/>
+	<origin xyz="${2*castor_link_radius} 0 ${castor_link_z_location}" rpy="0 0 0" />
+</joint>
+
+<link name="castor_link">
+	<visual>
+		<geometry>
+			<sphere radius="${castor_link_radius}" />
+		</geometry>
+		<origin rpy="0 0 0" xyz = "0 0 0"/>
+		<material name="blue"/>
+	</visual>
+	
+	<collision>
+		<geometry>
+			<sphere radius="${castor_link_radius}" />
+		</geometry>
+		<origin rpy="0 0 0" xyz = "0 0 0"/>
+	</collision>
+	
+	<xacro:inertia_castor/>   
+	
+</link>
+
+<!-- CASTOR LINK END -->
+
+<!-- LASER LINK AND JOINT -->
+
+
+<joint name="laser_joint" type="fixed">
+	<parent link="body_link"/>
+	<child link="laser_link"/>
+	<origin xyz="0.4 0 ${body_link_z_dim/2 + sensor_link_length/2}" rpy="0 0 0" />
+</joint>
+
+<link name="laser_link">
+	<visual>
+		<geometry>
+			<cylinder length="${sensor_link_length}" radius="${sensor_link_radius}" />
+		</geometry>
+		<origin rpy="0 0 0" xyz = "0 0 0"/>
+		<material name="black"/>
+	</visual>
+	
+	<collision>
+		<geometry>
+			<cylinder length="${sensor_link_length}" radius="${sensor_link_radius}" />
+		</geometry>
+		<origin rpy="0 0 0" xyz = "0 0 0"/>
+	</collision>
+	
+	<xacro:inertia_sensor/>				<!-- this macro is for the wheel. since the laser has different dimensions, it isn't an accurate model. but it works-->
+</link>
+
+
+<!--LASER LINK END-->
+
+<!-- IMU LINK AND JOINT -->
+
+<joint name="imu_joint" type="fixed">
+	<parent link="body_link"/>
+	<child link="imu_link"/>
+	<origin xyz="0 0 ${body_link_z_dim/2 + sensor_link_length/2}" rpy="0 0 0" />
+</joint>
+
+<link name="imu_link">
+	<visual>
+		<geometry>
+			<cylinder length="${sensor_link_length}" radius="${sensor_link_radius}" />
+		</geometry>
+		<origin rpy="0 0 0" xyz = "0 0 0"/>
+		<material name="gray"/>
+	</visual>
+	
+	<collision>
+		<geometry>
+			<cylinder length="${sensor_link_length}" radius="${sensor_link_radius}" />
+		</geometry>
+		<origin rpy="0 0 0" xyz = "0 0 0"/>
+	</collision>
+	
+	<xacro:inertia_sensor/>				<!-- this macro is for the wheel. since the laser has different dimensions, it isn't an accurate model. but it works-->
+</link>
+
+
+<!-- IMU LINK AND JOINT END-->
+
+</robot>
+
+
+	
+
+
+
+
+	
+
